@@ -1,0 +1,193 @@
+#Pierwszy projekt
+
+openapi: 3.0.3
+
+info: 
+  version: '1.0'
+  title: Rejestr Czasu Pracy
+  description: Rejestr mający na celu zapisywanie i odczytywanie czasu pracy, oraz ewentualnie wyszukanie danych wejść.
+  
+servers:
+  - url: https://localhost:{port}/home
+    variables:
+      port:
+        enum:
+          #MOŻNA DODAĆ KOLEJNE PORTY#
+          - "8888"
+        default: "8888"
+
+
+
+#security:
+  #- BasicAuth: []
+
+
+
+paths:
+  /rejestr:
+    get:
+      description: Opcja szukania danego wejść w bazie danych
+
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+            
+      responses:
+          '200':
+            description: Sukces w pokazaniu listy
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Wejscie'
+              
+              
+          '400':
+            $ref: '#/components/responses/400err'
+
+    post:
+      description: Pozwala wrzucić do rejestru nowy wpis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Wejscie'
+                      
+      responses:
+          '200':
+            description: Wykonano wpis w rejestrze
+            
+          '400':
+            $ref: '#/components/responses/400err'       
+                      
+  /szukaj/{Nazwa_użytkownika}:                     
+    get:
+      description: Wpisy do rejestru danego użytkownika
+      parameters:
+        - name: Nazwa_użytkownika
+          in: path
+          required: true
+          schema:
+            type: string
+      
+      responses:
+        '200':
+          description: Użytkownik znajduje się w rejestrze
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Data:
+                    type: string
+                  Nazwa_projektu:
+                    type: string
+                  Czas_pracy_minuty:
+                    type: integer
+                  Opis_wykonanej_pracy:
+                    type: string
+  
+        '400':
+          $ref: '#/components/responses/400err'
+                      
+  /szukaj/{Nazwa_projektu}:                     
+    get:
+      description: Wpisy do rejestru danego użytkownika
+      parameters:
+        - name: Nazwa_projektu
+          in: path
+          required: true
+          schema:
+            type: string
+      
+      responses:
+        '200':
+          description: Projekt znajduje się w rejestrze
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Nazwa_użytkownika:
+                    type: string
+                  Data:
+                    type: string
+                  Czas_pracy_minuty:
+                    type: integer
+                  Opis_wykonanej_pracy:
+                    type: string
+  
+        '400':
+          $ref: '#/components/responses/400err'
+    
+    
+                        
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    Wejscie:
+      type: object
+      required:
+        - Nazwa_użytkownika
+      properties:
+        Nazwa_użytknownika:
+          type: string
+        Data_dzień:
+          type: integer
+        Data_miesiąc:
+          type: integer
+        Data_rok:
+          type: integer
+        Nazwa_projektu:
+          type: string
+        Czas_pracy_minuty:
+          type: integer
+        Opis_wykonanej_pracy:
+          type: string                    
+  responses:
+    400err:
+      description: Nieudane żądanie
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      description: limit pokazywanych wejść na stronie
+      schema:
+        type: integer
+    Offset:
+      name: offset
+      in: query
+      description: Wybiera stronę rejestru na której chcemy się znajdować
+      schema:
+        type: integer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
